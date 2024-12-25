@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model comments {
+  commentid Int     @id @default(autoincrement())
+  text      String?
+  authorid  Int?
+  postid    Int?
+  users     users?  @relation(fields: [authorid], references: [userid], onDelete: NoAction, onUpdate: NoAction, map: "fk_author")
+  posts     posts?  @relation(fields: [postid], references: [postid], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
+}
+
+model groups {
+  groupid     Int           @id @default(autoincrement())
+  groupname   String?       @db.VarChar(255)
+  user_groups user_groups[]
+}
+
+model posts {
+  postid   Int        @id @default(autoincrement())
+  userid   Int?
+  title    String?    @db.VarChar(255)
+  content  String?
+  comments comments[]
+  users    users?     @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model profileinfo {
+  profileid Int    @id @default(autoincrement())
+  userid    Int?
+  metadata  Json?  @db.Json
+  users     users? @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_profile")
+}
+
+model user_groups {
+  userid  Int
+  groupid Int
+  groups  groups @relation(fields: [groupid], references: [groupid], onDelete: NoAction, onUpdate: NoAction, map: "fk_group")
+  users   users  @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_group")
+
+  @@id([userid, groupid])
+}
+
+model users {
+  userid      Int           @id @default(autoincrement())
+  name        String?       @db.VarChar(255)
+  email       String        @unique @db.VarChar(255)
+  password    String        @db.VarChar(255)
+  comments    comments[]
+  posts       posts[]
+  profileinfo profileinfo[]
+  user_groups user_groups[]
+}
