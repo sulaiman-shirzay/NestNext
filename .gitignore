@@ -1,5 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# Add exceptions for backend and frontend projects
+
 # Dependencies
 node_modules
 .pnp
